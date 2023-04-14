@@ -7,6 +7,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class GUIVisitor_ah21407 extends JFrame implements Visitor{
@@ -14,7 +15,10 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
     private String out;
     private Scanner in;
     private int purse;
-    private Item[] items;
+
+    //private Item[] items;
+    private ArrayList<Item> items;
+
     private int next;
     private int maximum = 500;
     private char userAnswer;
@@ -26,7 +30,7 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
         out = ps;
         in = new Scanner(is);
         purse = 0;
-        items = new Item[1000];
+        items = new ArrayList<Item>();
         next = 0;
     }
 
@@ -36,7 +40,7 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
         out = "h";
         in = new Scanner("f");
         purse = 0;
-        items = new Item[1000];
+        items = new ArrayList<Item>();
         next = 0;
     }
 
@@ -53,29 +57,29 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
 
         this.setTitle("Choice");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.getContentPane().setBackground(new Color(123, 50, 250));
+        this.getContentPane().setBackground(new Color(120, 55, 225));
         this.setLayout(new GridLayout(0, 1, 10, 10));
 
-        Border border = BorderFactory.createLineBorder(Color.green, 4);
+        Border border = BorderFactory.createLineBorder(Color.green, 5);
 
         JLabel purseLabel = new JLabel();
         purseLabel.setText("Gold: " + printGold());
         purseLabel.setForeground(Color.white);
-        purseLabel.setFont(new Font("Montserrat", Font.BOLD, 20));
+        purseLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
         purseLabel.setBorder(border);
         this.add(purseLabel);
 
         JLabel itemLabel = new JLabel();
         itemLabel.setText(printItems());
         itemLabel.setForeground(Color.white);
-        itemLabel.setFont(new Font("Montserrat", Font.BOLD, 20));
+        itemLabel.setFont(new Font("Sans Serif", Font.BOLD, 20));
         itemLabel.setBorder(border);
         this.add(itemLabel);
 
         JLabel label = new JLabel();
         label.setText(descriptioOfChoices);
         label.setForeground(Color.white);
-        label.setFont(new Font("Montserrat", Font.BOLD, 20));
+        label.setFont(new Font("Sans Serif", Font.BOLD, 20));
         label.setBorder(border);
         this.add(label);
 
@@ -111,7 +115,7 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
 
     @Override
     public boolean giveItem(Item itemGivenToVisitor) {
-        if (items[0] == null) {
+        if (items.isEmpty()) {
             JOptionPane.showMessageDialog(null, "You have no items");
         } else {
             JOptionPane.showMessageDialog(null, "You have: ");
@@ -119,30 +123,34 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
         }
         JOptionPane.showMessageDialog(null, "You are being offered: "+itemGivenToVisitor.name);
 
-        if (next >= items.length) {
+        if (items.size() >= maximum) {
             JOptionPane.showMessageDialog(null, "But you have no space and must decline.");
             return false;
         }
         if (getChoice("Do you accept (y/n)?", yOrN) == 'y') {
-            items[next] = itemGivenToVisitor;
-            next++;
+            items.add(itemGivenToVisitor);
             return true;
         } else return false;
     }
 
+
     @Override
     public boolean hasIdenticalItem(Item itemToCheckFor) {
-        for (int i=0; i<next;i++)
-            if (itemToCheckFor == items[i])
+        for (Item item : items) {
+            if (item == itemToCheckFor) {
                 return true;
+            }
+        }
         return false;
     }
 
     @Override
     public boolean hasEqualItem(Item itemToCheckFor) {
-        for (int i=0; i<next;i++)
-            if (itemToCheckFor.equals(items[i]))
+        for (Item item : items) {
+            if (item.equals(itemToCheckFor)) {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -185,19 +193,19 @@ public class GUIVisitor_ah21407 extends JFrame implements Visitor{
     public String printGold() {
         return Integer.toString(purse);
     }
-    public String printItems() {
-        String returnStatement;
-        if (items[0] == null) {
-            returnStatement = "You have no items.";
+    private String printItems() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Items: ");
+        if (items.isEmpty()) {
+            sb.append("None");
         } else {
-            returnStatement = "Items: ";
-            int i = 0;
-            while (items[i] != null) {
-                returnStatement = returnStatement + items[i] + ", ";
-                i++;
+            for (Item item : items) {
+                sb.append(item.name);
+                sb.append(", ");
             }
+            sb.delete(sb.length() - 2, sb.length());
         }
-
-        return returnStatement;
+        return sb.toString();
     }
+
 }
